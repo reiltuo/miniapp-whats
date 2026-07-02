@@ -165,6 +165,34 @@ button { cursor: pointer; }
   animation: offer-pulse 2.6s ease-in-out infinite;
 }
 
+.schedule-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  width: 94%;
+  margin: 10px auto 14px;
+  padding: 10px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  animation: message-in 0.28s ease-out both;
+}
+
+.schedule-options button {
+  border: 1px solid #9bd8ca;
+  border-radius: 9px;
+  padding: 10px 6px;
+  color: #075e54;
+  background: #e8fff8;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.schedule-options button:active {
+  transform: scale(0.97);
+  background: #d2f8ed;
+}
+
 .offer-card.discount { background: linear-gradient(135deg, #075e54, #00a884); }
 .offer-card.final { background: linear-gradient(135deg, #7c3aed, #db2777); }
 .offer-card small, .offer-card strong { display: block; }

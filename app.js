@@ -17,17 +17,13 @@ const state = {
 
 const scripts = [
   [
-    "Oi, posso falar com você por aqui? Este atendimento é automático, mas preparei tudo para explicar como funciona.",
-    "Faço uma chamada de vídeo privada para maiores de 18 anos, sem encontro presencial e com pagamento único pelo PIX.",
-    "Antes de eu te mostrar os horários, me diz: você procura uma conversa mais tranquila ou algo mais provocante?",
+    "oiie amor, tudo bem?",
   ],
   [
-    "Entendi. A chamada é personalizada e acontece em um ambiente reservado. Você escolhe o ritmo da conversa.",
-    "Tenho uma vaga disponível hoje. Qual período funciona melhor para você?",
+    "então vida, eu tenho alguns horários de chamada de vídeo livres pra hoje",
   ],
   [
-    "Consigo organizar nesse período. O acesso custa R$ 39,90 e a confirmação é imediata pelo PIX.",
-    "Assim que o pagamento for confirmado, você recebe a orientação para iniciar a chamada.",
+    "beleza amor, vou te enviar o meu PIX copia e cola e, assim que o pagamento for efetuado, estarei te esperando",
   ],
 ];
 
@@ -110,6 +106,42 @@ function addOffer({ amount, oldAmount, title, description, className = "" }) {
   scrollToLatest();
 }
 
+function formatHour(date) {
+  return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}
+
+function addScheduleOptions() {
+  const wrapper = document.createElement("section");
+  wrapper.className = "schedule-options";
+  wrapper.id = "schedule-options";
+
+  for (let offset = 0; offset <= 8; offset += 1) {
+    const date = new Date(Date.now() + offset * 60 * 60 * 1000);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = offset === 0
+      ? `Agora, ${formatHour(date)}`
+      : `Daqui ${offset}h, ${formatHour(date)}`;
+    button.addEventListener("click", () => chooseSchedule(button.textContent));
+    wrapper.append(button);
+  }
+
+  messages.append(wrapper);
+  scrollToLatest();
+}
+
+async function chooseSchedule(response) {
+  if (state.step !== 1) return;
+  document.querySelector("#schedule-options")?.remove();
+  disableComposer();
+  state.step = 2;
+  addMessage(response, "outgoing");
+  await sendSequence(scripts[2]);
+  disableComposer();
+  addOffer({ amount: 3990, title: "Chamada de vídeo privada", description: "Pagamento único de R$ 39,90 pelo PIX." });
+  startDownsells();
+}
+
 function startDownsells() {
   state.offerStartedAt = Date.now();
   state.firstDownsell = setTimeout(() => {
@@ -124,21 +156,19 @@ function startDownsells() {
 }
 
 async function advanceConversation(response) {
-  addMessage(response, "outgoing");
   input.value = "";
   if (state.step === 0) {
     state.step = 1;
+    addMessage(response, "outgoing");
     await sendSequence(scripts[1]);
+    addScheduleOptions();
     return;
   }
   if (state.step === 1) {
-    state.step = 2;
-    await sendSequence(scripts[2]);
-    disableComposer();
-    addOffer({ amount: 3990, title: "Chamada de vídeo privada", description: "Pagamento único e confirmação imediata." });
-    startDownsells();
+    await chooseSchedule(response);
     return;
   }
+  addMessage(response, "outgoing");
   addMessage("O pagamento pode ser feito no botão de reserva acima.");
 }
 
