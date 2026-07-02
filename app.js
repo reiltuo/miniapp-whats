@@ -2,7 +2,6 @@ const messages = document.querySelector("#messages");
 const composer = document.querySelector("#composer");
 const input = document.querySelector("#lead-input");
 const sendButton = document.querySelector("#send-button");
-const statusLabel = document.querySelector("#contact-status");
 const pixModal = document.querySelector("#pix-modal");
 
 const state = {
@@ -45,7 +44,6 @@ function addMessage(text, direction = "incoming") {
 }
 
 function showTyping() {
-  statusLabel.textContent = "digitando...";
   const bubble = document.createElement("article");
   bubble.className = "message incoming typing";
   bubble.id = "typing";
@@ -56,7 +54,6 @@ function showTyping() {
 
 function hideTyping() {
   document.querySelector("#typing")?.remove();
-  statusLabel.textContent = "assistente virtual";
 }
 
 function wait(milliseconds) {
