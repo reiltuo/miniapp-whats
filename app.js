@@ -56,7 +56,7 @@ function showTyping() {
 
 function hideTyping() {
   document.querySelector("#typing")?.remove();
-  statusLabel.textContent = "atendimento automatizado";
+  statusLabel.textContent = "assistente virtual";
 }
 
 function wait(milliseconds) {
@@ -226,7 +226,6 @@ document.querySelector("#confirm-age").addEventListener("click", async () => {
 });
 
 document.querySelector("#leave-page").addEventListener("click", () => location.replace("about:blank"));
-document.querySelector(".back-button").addEventListener("click", () => history.back());
 document.querySelector("#close-pix").addEventListener("click", () => { pixModal.hidden = true; });
 document.querySelector("#check-payment").addEventListener("click", checkPayment);
 document.querySelector("#copy-pix").addEventListener("click", async () => {

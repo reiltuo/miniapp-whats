@@ -10,25 +10,24 @@
 <body>
   <main class="chat-app">
     <header class="chat-header">
-      <button class="back-button" type="button" aria-label="Voltar">‹</button>
+      <span class="back-symbol" aria-hidden="true">‹</span>
       <img src="assets/profile.jpeg" alt="Foto de perfil de Vitória">
       <div class="contact">
         <strong>Vitória</strong>
-        <small id="contact-status">atendimento automatizado</small>
+        <small id="contact-status">assistente virtual</small>
       </div>
-      <span class="video-symbol" aria-hidden="true"></span>
+      <div class="header-symbols" aria-hidden="true"><span class="phone-symbol"></span><span class="menu-symbol"></span></div>
     </header>
-
-    <section class="automation-notice">
-      Conversa automática para contratação de chamada de vídeo. Nenhum encontro físico é oferecido.
-    </section>
 
     <section class="messages" id="messages" aria-live="polite">
       <div class="day-label">HOJE</div>
     </section>
 
     <form class="composer" id="composer">
-      <input id="lead-input" type="text" autocomplete="off" placeholder="Digite uma mensagem" maxlength="300" disabled>
+      <span class="plus-symbol" aria-hidden="true"></span>
+      <div class="input-shell"><input id="lead-input" type="text" autocomplete="off" placeholder="Mensagem" maxlength="300" disabled><span class="sticker-symbol" aria-hidden="true"></span></div>
+      <span class="camera-symbol" aria-hidden="true"></span>
+      <span class="mic-symbol" aria-hidden="true"></span>
       <button id="send-button" type="submit" aria-label="Enviar mensagem" disabled>Enviar</button>
     </form>
   </main>
