@@ -60,7 +60,7 @@ function wait(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
-async function sendSequence(sequence) {
+async function sendSequence(sequence, reEnableComposer = true) {
   disableComposer();
   for (const text of sequence) {
     showTyping();
@@ -69,13 +69,13 @@ async function sendSequence(sequence) {
     addMessage(text);
     await wait(420);
   }
-  enableComposer();
+  if (reEnableComposer) enableComposer();
 }
 
 function enableComposer() {
   input.disabled = false;
   sendButton.disabled = false;
-  input.placeholder = "Digite qualquer resposta";
+  input.placeholder = "Mensagem";
   input.focus();
 }
 
@@ -98,7 +98,8 @@ function addOffer({ amount, oldAmount, title, description, className = "" }) {
     <p>${description}</p>
     <button type="button">Gerar PIX e reservar</button>
   `;
-  card.querySelector("button").addEventListener("click", () => createPix(amount));
+  const offerButton = card.querySelector("button");
+  offerButton.addEventListener("click", () => createPix(amount, offerButton));
   messages.append(card);
   scrollToLatest();
 }
@@ -133,8 +134,7 @@ async function chooseSchedule(response) {
   disableComposer();
   state.step = 2;
   addMessage(response, "outgoing");
-  await sendSequence(scripts[2]);
-  disableComposer();
+  await sendSequence(scripts[2], false);
   addOffer({ amount: 3990, title: "Chamada de vídeo privada", description: "Pagamento único de R$ 39,90 pelo PIX." });
   startDownsells();
 }
@@ -175,14 +175,16 @@ composer.addEventListener("submit", event => {
   if (response) advanceConversation(response);
 });
 
-async function createPix(amount) {
+async function createPix(amount, clickedButton) {
   clearTimeout(state.firstDownsell);
   clearTimeout(state.finalDownsell);
   state.amount = amount;
+  document.querySelectorAll(".offer-card button").forEach(button => { button.disabled = true; });
+  if (clickedButton) clickedButton.textContent = "Gerando PIX...";
   document.querySelector("#pix-total").textContent = money(amount);
   document.querySelector("#pix-code").value = "Gerando cobrança...";
   document.querySelector("#qr-image").removeAttribute("src");
-  document.querySelector("#payment-status").textContent = "";
+  document.querySelector("#payment-status").textContent = "Gerando uma cobrança segura...";
   pixModal.hidden = false;
 
   try {
@@ -191,16 +193,23 @@ async function createPix(amount) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount }),
     });
-    const charge = await response.json();
+    const charge = await response.json().catch(() => ({ error: "Não foi possível gerar o PIX" }));
     if (!response.ok) throw new Error(charge.error || "Não foi possível gerar o PIX");
 
     state.chargeId = charge.id;
     document.querySelector("#pix-code").value = charge.copyPasteCode;
-    document.querySelector("#qr-image").src = charge.qrCodeBase64;
+    document.querySelector("#qr-image").src = charge.qrCodeBase64.startsWith("data:")
+      ? charge.qrCodeBase64
+      : `data:image/png;base64,${charge.qrCodeBase64}`;
+    document.querySelector("#payment-status").textContent = "PIX gerado. Aguardando pagamento.";
     clearInterval(state.statusPolling);
     state.statusPolling = setInterval(checkPayment, 5000);
   } catch (error) {
     document.querySelector("#payment-status").textContent = error.message;
+    document.querySelectorAll(".offer-card button").forEach(button => {
+      button.disabled = false;
+      button.textContent = "Gerar PIX e reservar";
+    });
   }
 }
 
@@ -208,12 +217,14 @@ async function checkPayment() {
   if (!state.chargeId) return;
   const response = await fetch(`/api/pix/status?id=${encodeURIComponent(state.chargeId)}`);
   if (!response.ok) return;
-  const payment = await response.json();
+  const payment = await response.json().catch(() => ({}));
   if (payment.status === "paid") {
     clearInterval(state.statusPolling);
     clearTimeout(state.firstDownsell);
     clearTimeout(state.finalDownsell);
     document.querySelector("#payment-status").textContent = "Pagamento confirmado. Sua chamada foi reservada.";
+  } else {
+    document.querySelector("#payment-status").textContent = "Pagamento ainda não identificado. Tente novamente em alguns segundos.";
   }
 }
 
@@ -226,7 +237,13 @@ document.querySelector("#leave-page").addEventListener("click", () => location.r
 document.querySelector("#close-pix").addEventListener("click", () => { pixModal.hidden = true; });
 document.querySelector("#check-payment").addEventListener("click", checkPayment);
 document.querySelector("#copy-pix").addEventListener("click", async () => {
-  await navigator.clipboard.writeText(document.querySelector("#pix-code").value);
+  const pixInput = document.querySelector("#pix-code");
+  try {
+    await navigator.clipboard.writeText(pixInput.value);
+  } catch {
+    pixInput.select();
+    document.execCommand("copy");
+  }
   document.querySelector("#copy-pix").textContent = "Copiado";
   setTimeout(() => { document.querySelector("#copy-pix").textContent = "Copiar"; }, 1400);
 });
