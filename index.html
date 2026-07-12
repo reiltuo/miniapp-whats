@@ -3,68 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#075e54">
-  <title>Conversa privada</title>
+  <meta name="theme-color" content="#101816">
+  <title>Chamada de vídeo</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="chat-app">
-    <header class="chat-header">
-      <span class="icon back-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></span>
-      <img src="assets/profile.jpeg" alt="Foto de perfil de Vitória">
-      <div class="contact">
-        <strong>Vitória</strong>
+  <main class="call-app" id="call-app">
+    <section class="incoming-call" id="incoming-call" aria-labelledby="caller-name">
+      <div class="ambient-bg" aria-hidden="true">
+        <img src="assets/profile.jpeg" alt="">
       </div>
-    </header>
 
-    <section class="messages" id="messages" aria-live="polite">
-      <div class="day-label">HOJE</div>
-      <div class="system-label">Conversa com assistente virtual</div>
+      <div class="phone-status">
+        <span id="status-time">00:00</span>
+        <span class="status-icons" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M3 18h3v3H3zM8 14h3v7H8zM13 10h3v11h-3zM18 6h3v15h-3z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M2 8.5C7.8 3.2 16.2 3.2 22 8.5M5.5 12c3.9-3.4 9.1-3.4 13 0M9 15.5c1.8-1.4 4.2-1.4 6 0M12 19h.01"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M3 8h15a2 2 0 012 2v4a2 2 0 01-2 2H3zM20 10h1a1 1 0 011 1v2a1 1 0 01-1 1h-1"/></svg>
+        </span>
+      </div>
+
+      <div class="caller-card">
+        <img class="caller-photo" src="assets/profile.jpeg" alt="Foto de perfil">
+        <p class="call-label">chamada de vídeo</p>
+        <h1 id="caller-name">Vitória</h1>
+        <p class="ringing-text" id="ringing-text">chamando...</p>
+      </div>
+
+      <div class="incoming-actions" aria-label="Controles da chamada">
+        <button class="call-action decline" id="decline-call" type="button" aria-label="Recusar chamada">
+          <svg viewBox="0 0 24 24"><path d="M6.6 10.8c3.4-1.8 7.4-1.8 10.8 0l1.1.6a1.8 1.8 0 01.7 2.4l-.8 1.6a1.8 1.8 0 01-2.2.9l-2.1-.8a1.8 1.8 0 01-1.1-1.6v-.7a8.7 8.7 0 00-2 0v.7a1.8 1.8 0 01-1.1 1.6l-2.1.8a1.8 1.8 0 01-2.2-.9l-.8-1.6a1.8 1.8 0 01.7-2.4z"/></svg>
+        </button>
+        <button class="call-action accept" id="accept-call" type="button" aria-label="Atender chamada">
+          <svg viewBox="0 0 24 24"><path d="M7 4.8l2.2-.8a1.8 1.8 0 012.2.9l.9 1.9a1.8 1.8 0 01-.4 2l-1 1a11 11 0 004.3 4.3l1-1a1.8 1.8 0 012-.4l1.9.9a1.8 1.8 0 01.9 2.2l-.8 2.2a2.2 2.2 0 01-2.4 1.4C10.9 18.3 5.7 13.1 4.6 6.2A2.2 2.2 0 017 4.8z"/></svg>
+        </button>
+      </div>
+
+      <p class="gesture-copy">Deslize ou toque para atender</p>
     </section>
 
-    <form class="composer" id="composer">
-      <span class="icon plus-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
-      <div class="input-shell"><input id="lead-input" type="text" autocomplete="off" placeholder="Mensagem" maxlength="300" disabled></div>
-      <span class="icon camera-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h3l1.4-2h7.2L17 7h3a2 2 0 012 2v9a2 2 0 01-2 2H4a2 2 0 01-2-2V9a2 2 0 012-2z"/><circle cx="12" cy="13" r="4"/></svg></span>
-      <span class="icon mic-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3M9 21h6"/></svg></span>
-      <button id="send-button" type="submit" aria-label="Enviar mensagem" disabled>Enviar</button>
-    </form>
+    <section class="active-call" id="active-call" hidden>
+      <video id="call-video" playsinline preload="metadata"></video>
+      <div class="video-placeholder" id="video-placeholder">
+        <img src="assets/profile.jpeg" alt="">
+        <strong>Vídeo da chamada pendente</strong>
+        <span>Depois você só precisa colocar o arquivo em <b>assets/call-video.mp4</b></span>
+      </div>
+
+      <div class="call-gradient top"></div>
+      <div class="call-gradient bottom"></div>
+
+      <header class="active-header">
+        <button class="round-icon" id="minimize-call" type="button" aria-label="Minimizar">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div>
+          <strong>Vitória</strong>
+          <span id="call-timer">00:00</span>
+        </div>
+      </header>
+
+      <aside class="self-preview">
+        <div class="self-camera">
+          <svg viewBox="0 0 24 24"><path d="M4 7h11a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V9a2 2 0 012-2zM17 10l5-3v10l-5-3z"/></svg>
+          <span>Você</span>
+        </div>
+      </aside>
+
+      <footer class="call-controls" aria-label="Controles da chamada ativa">
+        <button class="control-button" type="button" aria-label="Microfone">
+          <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3M9 21h6"/></svg>
+        </button>
+        <button class="control-button" type="button" aria-label="Câmera">
+          <svg viewBox="0 0 24 24"><path d="M4 7h11a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V9a2 2 0 012-2zM17 10l5-3v10l-5-3z"/></svg>
+        </button>
+        <button class="control-button" type="button" aria-label="Alto-falante">
+          <svg viewBox="0 0 24 24"><path d="M5 9v6h4l5 4V5L9 9zM17 9a5 5 0 010 6M19.5 6.5a8.5 8.5 0 010 11"/></svg>
+        </button>
+        <button class="control-button end" id="end-call" type="button" aria-label="Encerrar chamada">
+          <svg viewBox="0 0 24 24"><path d="M6.6 10.8c3.4-1.8 7.4-1.8 10.8 0l1.1.6a1.8 1.8 0 01.7 2.4l-.8 1.6a1.8 1.8 0 01-2.2.9l-2.1-.8a1.8 1.8 0 01-1.1-1.6v-.7a8.7 8.7 0 00-2 0v.7a1.8 1.8 0 01-1.1 1.6l-2.1.8a1.8 1.8 0 01-2.2-.9l-.8-1.6a1.8 1.8 0 01.7-2.4z"/></svg>
+        </button>
+      </footer>
+    </section>
   </main>
 
   <div class="age-backdrop" id="age-gate">
     <section class="age-modal" role="dialog" aria-modal="true" aria-labelledby="age-title">
       <span class="age-mark">18+</span>
-      <h1 id="age-title">Conteúdo para adultos</h1>
-      <p>Esta experiência oferece uma chamada de vídeo privada entre adultos. Confirme que você tem 18 anos ou mais.</p>
+      <h2 id="age-title">Conteúdo para adultos</h2>
+      <p>Esta experiência simula uma chamada de vídeo privada entre adultos. Confirme que você tem 18 anos ou mais.</p>
       <button id="confirm-age" type="button">Tenho 18 anos ou mais</button>
       <button id="leave-page" class="secondary" type="button">Sair</button>
     </section>
   </div>
-
-  <div class="pix-backdrop" id="pix-modal" hidden>
-    <section class="pix-sheet" role="dialog" aria-modal="true" aria-labelledby="pix-title">
-      <button class="close-pix" id="close-pix" type="button" aria-label="Fechar">×</button>
-      <span class="pix-label">PIX</span>
-      <h2 id="pix-title">Pagamento da chamada</h2>
-      <p id="pix-description">Chamada de vídeo privada</p>
-      <img id="qr-image" alt="QR Code PIX">
-      <label for="pix-code">PIX COPIA E COLA</label>
-      <div class="copy-row">
-        <input id="pix-code" readonly value="Gerando cobrança...">
-        <button id="copy-pix" type="button">Copiar</button>
-      </div>
-      <strong class="pix-total" id="pix-total">R$ 39,90</strong>
-      <button class="paid-button" id="check-payment" type="button">Já realizei o pagamento</button>
-      <p class="payment-status" id="payment-status" role="status" aria-live="polite"></p>
-    </section>
-  </div>
-
-  <template id="incoming-template">
-    <article class="message incoming"><p></p><time></time></article>
-  </template>
-  <template id="outgoing-template">
-    <article class="message outgoing"><p></p><span class="message-meta"><time></time><span class="read-mark">✓✓</span></span></article>
-  </template>
 
   <script src="app.js"></script>
 </body>
